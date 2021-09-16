@@ -1,4 +1,4 @@
-# Demo Spring Selenium Automation Project
+# Project Nautilus
 
 ## Table of Contents
 
@@ -9,7 +9,7 @@
 - [Running Through IntelliJ](#running-through-intellij)
 
 ## Authors
-* [Soraia Reis](https://github.com/soraiareis)
+Building from the excelent template created by [Soraia Reis](https://github.com/soraiareis), Nautilis is written By Gerry
 
 ## Pre-requisites
 
