@@ -1,4 +1,26 @@
+
 # Project Nautilus
+![20kLeaguesOrSo](https://upload.wikimedia.org/wikipedia/commons/b/be/Nautilus_macromphalus_-_edited_image.jpg)
+
+## Objectives
+Create a project on Github that has the following elements: 
+- Dockerized for ease of distribution and updating of tests 
+<details><summary>Secret extra Mission</summary>
+
+![Classifed 4th Directive](https://i.stack.imgur.com/vbB3e.jpg)
+</details>
+
+- Written in Java / Cucumber 
+- Use Selenium and any additionally needed frameworks 
+- Runs both Firefox and Chrome 
+- Browses a selection of pages on the w3 site and validates the following: - There are no console errors on page loads (chrome minimum) 
+- The response code from the page (200, 302, 404, etc.) 
+- All links on the page go to another live (non 4xx) page (no need to actually parse the linked page/image). 
+- Pages to browse: 
+- https://www.w3.org/standards/badpage 
+- https://www.w3.org/standards/webofdevices/multimodal 
+- https://www.w3.org/standards/webdesign/htmlcss 
+- Report the results of the scan.
 
 ## Table of Contents
 
@@ -9,7 +31,8 @@
 - [Running Through IntelliJ](#running-through-intellij)
 
 ## Authors
-Building from the excelent template created by [Soraia Reis](https://github.com/soraiareis), Nautilis is written By Gerry
+Building from the excelent template created by [Soraia Reis](https://github.com/soraiareis), 
+Nautilis is written By Gerry
 
 ## Pre-requisites
 
