@@ -12,16 +12,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class WebDriverManager {
 
   private static final String DOCKER_HOST = "http://127.0.0.1";
   private static final String SELENIUM_PORT = "4444";
   private static final String CHROME = "chrome";
+  private static final String FIREFOX = "firefox";
   private static final String CONTEXT = "local";
 
   @Autowired
-  private DemoSpringSeleniumProperties properties;
+  private ProjectNautilusProperties properties;
 
   @Bean
   @Scope("cucumber-glue")
@@ -30,12 +34,18 @@ public class WebDriverManager {
         : getRemoteWebDriver(properties.getBrowser());
   }
 
-  private WebDriver getRemoteWebDriver(String browser) throws IOException {
+  private WebDriver getRemoteWebDriver(String browser) throws IOException, UnsupportedOperationException {
     String remote = String.format("%s:%s/wd/hub", DOCKER_HOST, SELENIUM_PORT);
     if (browser.equalsIgnoreCase(CHROME)) {
       return new RemoteWebDriver(new URL(remote), new ChromeOptions());
     }
-    return new RemoteWebDriver(new URL(remote), new FirefoxOptions());
+    if (browser.equalsIgnoreCase(FIREFOX)){
+      return new RemoteWebDriver(new URL(remote), new FirefoxOptions());
+    }
+    else{
+      log.error("FATAL: The Browser: " + browser + " is not yet supported");
+      throw new UnsupportedOperationException("Not supported yet");
+    }
   }
 }
 
