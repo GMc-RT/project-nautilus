@@ -1,4 +1,4 @@
-context: local
+context: remote
 browser: firefox
 
 badPageURL: https://www.w3.org/standards/badpage
@@ -7,4 +7,4 @@ htmlCssURL: https://www.w3.org/standards/webdesign/htmlcss
 
 logging:
   level:
-    ROOT: TRACE
+    ROOT: DEBUG
