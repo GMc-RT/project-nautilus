@@ -13,11 +13,13 @@ import org.springframework.stereotype.Component;
 @Scope("cucumber-glue")
 public class HtmlCss{
 	
+	public WebDriver driver;
+
 	public HtmlCss(WebDriver adriver) {
 		driver = adriver;
 		PageFactory.initElements(driver, this);
 	}
-	public WebDriver driver;
+	
 
 	@FindBy(tagName = "a") 
 	List<WebElement> allLinks;

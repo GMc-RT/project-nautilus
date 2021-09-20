@@ -11,12 +11,12 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,23 +25,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class BadPageSteps {
 
   @Autowired
-  public BadPage badPage;
-  public LogEntries logs;
+  public BadPage thisPage;
+  public String pageName = "BadPage";
 
   @Given("^I open BadPage$")
   public void iOpenBadPage() {
-    log.info("Go to: BadPage");
-    System.out.print("****************************Start Badpage");
+    log.info("Go to: " + pageName);
+    System.out.print("****************************Start " + pageName);
   }
 
   @Then("^On BadPage I see the title header is \"(.*)\"$")
   public void iSeeMessageBadPage(String message) {
-    assertThat(this.badPage.getHeaderText(), is(message));
+    assertThat(this.thisPage.getHeaderText(), is(message));
   }
 
   @Then("^On BadPage I see that none of the links on this page are broken$")
   public void iCheckAllLinksBadPage(){
-    List<WebElement> allLinks = this.badPage.getAllLinks();
+    List<WebElement> allLinks = this.thisPage.getAllLinks();
     String resultString = checkIfAnyLinkFails(allLinks);
     
     if (resultString.equals("There are no broken links on this page")){
@@ -60,6 +60,7 @@ public class BadPageSteps {
     HttpURLConnection con = (HttpURLConnection) new URL("https://www.w3.org/standards/badpage").openConnection();
     con.setRequestMethod("HEAD");
     int response = con.getResponseCode();
+    System.out.println("The response is: "+ response + ", expected is : " + msg);
     int expected = Integer.parseInt(msg);
     if (response == expected){
       log.info("The codes are a match("+ msg + "))");
@@ -72,7 +73,6 @@ public class BadPageSteps {
   @Then("^On BadPage I see that there are no errors in the console log$")
   public void iCheckLogsForErrorsBadPage(){
     System.out.print("****************************Starting Outer Check logs");
-    getLogs();
     String result = getErrorLogReport();
     if (result.equals("No Error logs found")){
       log.info("The Logs have no errors.");
@@ -91,11 +91,17 @@ public class BadPageSteps {
 		String foundErrors = "";
 
 		for (WebElement link : allLinks){
-			URL = link.getAttribute("href");
-			responseCode = getResponseCode(URL);
-			if (responseCode >= 400){
-				foundErrors += ("/n Got a code :" + responseCode.toString()+ " from the link with text: " + link.getText());
-			}
+      try{
+        URL = link.getAttribute("href");
+        responseCode = getResponseCode(URL);
+        if (responseCode >= 400 || link.getText().contains("@")){
+          foundErrors += ("/n Got a code :" + responseCode.toString()+ " from the link with text: " + link.getText());
+        }
+      }catch( Exception ex){
+        foundErrors += ("/n Failed to get response from " + link.getText());
+
+      }
+
 		}
 		if (foundErrors.length() == 0){
 			return successMsg;
@@ -118,17 +124,26 @@ public class BadPageSteps {
 		}
 	}
 
-  public LogEntries getLogs(){	
-		System.out.print("****************************Starting Get logs");	
-		logs= badPage.driver.manage().logs().get(LogType.BROWSER);	
-		clearLogs();
-    return logs;
+  public List<LogEntry> getLogs(){	
+		System.out.print("****************************Starting Get logs");
+    
+    List<LogEntry> newLogs = new ArrayList<LogEntry>();
+    
+    try{	
+      newLogs = thisPage.driver.manage().logs().get(LogType.BROWSER).getAll();
+      System.out.print("****************************Log contents/n" 
+      + newLogs+ "/n ****************************end Log contents/n");
+    } catch (Exception ex){
+      System.out.print("Get logs Error: " + ex.toString());
+    }
+    return newLogs;
 	}
 
 	public String getErrorLogReport(){
 		System.out.print("****************************Starting Check logs");
 		String errorString = "";
-    for (LogEntry entry : logs) {
+    List<LogEntry> newLogs = getLogs();
+    for (LogEntry entry : newLogs) {
 					if (entry.getLevel().equals(Level.SEVERE)){
 						errorString += errorString + "/n SEVERE: " + entry.toString();
 					}
@@ -144,7 +159,7 @@ public class BadPageSteps {
 	public  void clearLogs(){
 		System.out.print("****************************Starting Clear logs");
 		String script = "console.clear();";
-    	JavascriptExecutor js = (JavascriptExecutor) badPage.driver;  
+    	JavascriptExecutor js = (JavascriptExecutor) thisPage.driver;  
 		js.executeScript(script);
 	}
 

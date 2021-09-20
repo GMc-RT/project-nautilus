@@ -12,12 +12,14 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("cucumber-glue")
 public class Multimodal{	
+
+	public WebDriver driver;
 	
 	public Multimodal(WebDriver adriver) {
 		driver = adriver;
 		PageFactory.initElements(driver, this);
 	}
-	public WebDriver driver;
+	
 
 	@FindBy(tagName = "a") 
 	List<WebElement> allLinks;

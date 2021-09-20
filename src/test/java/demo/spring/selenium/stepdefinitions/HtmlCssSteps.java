@@ -1,6 +1,5 @@
 package demo.spring.selenium.stepdefinitions;
 
-import demo.spring.selenium.config.ProjectNautilusProperties;
 import demo.spring.selenium.pages.HtmlCss;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -8,39 +7,40 @@ import lombok.extern.slf4j.Slf4j;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
 public class HtmlCssSteps {
-
   @Autowired
-  private HtmlCss htmlCss;
-  public LogEntries logs;
-  private ProjectNautilusProperties properties;
+  public HtmlCss thisPage;
+  public String pageName = "HtmlCss";
 
   @Given("^I open HtmlCss$")
   public void iOpenHtmlCss() {
-    log.info("Go to: HtmlCss");
-    }
+    log.info("Go to: " + pageName);
+    System.out.print("****************************Start " + pageName);
+  }
 
   @Then("^On HtmlCss I see the title header is \"(.*)\"$")
-  public void iSeeMessageHtml(String message) {
-    assertThat(this.htmlCss.getHeaderText(), is(message));
+  public void iSeeMessageHtmlCss(String message) {
+    assertThat(this.thisPage.getHeaderText(), is(message));
   }
 
   @Then("^On HtmlCss I see that none of the links on this page are broken$")
-  public void iCheckAllLinksHtml(){
-    List<WebElement> allLinks = this.htmlCss.getAllLinks();
+  public void iCheckAllLinksHtmlCss(){
+    List<WebElement> allLinks = this.thisPage.getAllLinks();
     String resultString = checkIfAnyLinkFails(allLinks);
     
     if (resultString.equals("There are no broken links on this page")){
@@ -48,23 +48,30 @@ public class HtmlCssSteps {
     }else{
         log.error(resultString);
     }
-    assertThat("There are no broken links on this page", is(resultString));
+    assertThat(resultString, is("There are no broken links on this page"));
   }
 
   @Then("^On HtmlCss I check the response code is \"(.*)\"$")
-  public void iCheckResponseCodeHtml(int msg){
-    int response = getResponseCode(properties.getHtmlCssURL());
-    if (response == msg){
+  public void iCheckResponseCodeHtmlCss(String msg) throws MalformedURLException, IOException{
+    System.out.print("****************************Starting Outer Check Response Codes");
+    getResponseCode("https://www.w3.org/standards/webdesign/htmlcss");
+    HttpURLConnection.setFollowRedirects(false);
+    HttpURLConnection con = (HttpURLConnection) new URL("https://www.w3.org/standards/webdesign/htmlcss").openConnection();
+    con.setRequestMethod("HEAD");
+    int response = con.getResponseCode();
+    System.out.println("The response is: "+ response + ", expected is : " + msg);
+    int expected = Integer.parseInt(msg);
+    if (response == expected){
       log.info("The codes are a match("+ msg + "))");
     }else{
       log.error("The codes do not match. Expected : " + msg + " found " + response);
     }
-    assertThat(response, is(msg));
+    assertThat(response, is(expected));
   }
 
   @Then("^On HtmlCss I see that there are no errors in the console log$")
-  public void iCheckLogsForErrorsHtml(){
-    getLogs();
+  public void iCheckLogsForErrorsHtmlCss(){
+    System.out.print("****************************Starting Outer Check logs");
     String result = getErrorLogReport();
     if (result.equals("No Error logs found")){
       log.info("The Logs have no errors.");
@@ -75,7 +82,6 @@ public class HtmlCssSteps {
     assertThat(result, is("No Error logs found"));    
   }
 
-  
   public String checkIfAnyLinkFails(List<WebElement> allLinks){
 		String successMsg = "There are no broken links on this page";
 		String failureMsg = "Here are the broken links from this page: ";
@@ -84,11 +90,17 @@ public class HtmlCssSteps {
 		String foundErrors = "";
 
 		for (WebElement link : allLinks){
-			URL = link.getAttribute("href");
-			responseCode = getResponseCode(URL);
-			if (responseCode >= 400){
-				foundErrors += ("/n Got a code :" + responseCode.toString()+ " from the link with text: " + link.getText());
-			}
+      try{
+        URL = link.getAttribute("href");
+        responseCode = getResponseCode(URL);
+        if (responseCode >= 400){
+          foundErrors += ("/n Got a code :" + responseCode.toString()+ " from the link with text: " + link.getText());
+        }
+      }catch( Exception ex){
+        foundErrors += ("/n Failed to get response from " + link.getText());
+
+      }
+
 		}
 		if (foundErrors.length() == 0){
 			return successMsg;
@@ -111,17 +123,26 @@ public class HtmlCssSteps {
 		}
 	}
 
-  public LogEntries getLogs(){	
-		System.out.print("****************************Starting Get logs");	
-		logs= htmlCss.driver.manage().logs().get(LogType.BROWSER);	
-		clearLogs();
-    return logs;
+  public List<LogEntry> getLogs(){	
+		System.out.print("****************************Starting Get logs");
+    
+    List<LogEntry> newLogs = new ArrayList<LogEntry>();
+    
+    try{	
+      newLogs = thisPage.driver.manage().logs().get(LogType.BROWSER).getAll();
+      System.out.print("****************************Log contents/n" 
+      + newLogs+ "/n ****************************end Log contents/n");
+    } catch (Exception ex){
+      System.out.print("Get logs Error: " + ex.toString());
+    }
+    return newLogs;
 	}
-  
-  public String getErrorLogReport(){
+
+	public String getErrorLogReport(){
 		System.out.print("****************************Starting Check logs");
 		String errorString = "";
-    for (LogEntry entry : logs) {
+    List<LogEntry> newLogs = getLogs();
+    for (LogEntry entry : newLogs) {
 					if (entry.getLevel().equals(Level.SEVERE)){
 						errorString += errorString + "/n SEVERE: " + entry.toString();
 					}
@@ -137,9 +158,8 @@ public class HtmlCssSteps {
 	public  void clearLogs(){
 		System.out.print("****************************Starting Clear logs");
 		String script = "console.clear();";
-    	JavascriptExecutor js = (JavascriptExecutor) htmlCss.driver;  
+    	JavascriptExecutor js = (JavascriptExecutor) thisPage.driver;  
 		js.executeScript(script);
 	}
-
 
 }

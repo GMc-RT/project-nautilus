@@ -12,9 +12,6 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties
 public class ProjectNautilusProperties{
 
-//   @Value("${host}")
-//   private String host;
-
     @Value("${badPageURL}")
     private String badPageURL;
 
