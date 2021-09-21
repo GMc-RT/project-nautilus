@@ -22,6 +22,8 @@ Create a project on Github that has the following elements:
 - https://www.w3.org/standards/webdesign/htmlcss 
 - Report the results of the scan.
 
+Project also includes WhiteWhale.py, a quick and dirty python implimentation
+
 ## Table of Contents
 
 - [Authors](#authors)
