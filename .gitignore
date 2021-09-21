@@ -9,3 +9,5 @@ out
 .classpath
 .project
 *.class
+.settings/org.springframework.ide.eclipse.prefs
+*.tmp

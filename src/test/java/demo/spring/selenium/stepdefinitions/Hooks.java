@@ -14,8 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.AfterTest;
 
 @CucumberContextConfiguration
 @SpringBootTest(classes = {SpringContextConfiguration.class})
