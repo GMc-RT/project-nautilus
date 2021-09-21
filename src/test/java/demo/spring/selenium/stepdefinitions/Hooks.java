@@ -11,6 +11,8 @@ import io.cucumber.java.Scenario;
 import io.cucumber.spring.CucumberContextConfiguration;
 import lombok.extern.slf4j.Slf4j;
 
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,28 +42,16 @@ public class Hooks {
 	}
   }
 
-//   @AfterTest
-//   public void closeBrowser(Scenario scenario) {
-// 	try{
-//     	// byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-//    		// scenario.attach(screenshot, "image/png", scenario.getName());
-// 		driver.quit();
-// 		driver = null;
-	
-// 	}catch(Exception ex){
-// 		log.info("Driver Already closed");
-// 	}
-//     log.info("[ENDED] Scenario: " + scenario.getName());
-//   }
+
 
   @After
   public void quitBrowser(Scenario scenario) {
 	try{
-    	// byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-   		// scenario.attach(screenshot, "image/png", scenario.getName());
-		driver.quit();
-		driver = null;
-	
+    	 byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+   		 scenario.attach(screenshot, "image/png", scenario.getName());
+			driver.quit();
+			driver = null;
+
 	}catch(Exception ex){
 		log.info("Driver Already closed");
 	}

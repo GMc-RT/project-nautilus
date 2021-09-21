@@ -93,7 +93,7 @@ public class HtmlCssSteps {
       try{
         URL = link.getAttribute("href");
         responseCode = getResponseCode(URL);
-        if (responseCode >= 400){
+        if (responseCode >= 400 & !link.getText().contains("@")){
           foundErrors += ("/n Got a code :" + responseCode.toString()+ " from the link with text: " + link.getText());
         }
       }catch( Exception ex){

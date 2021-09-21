@@ -8,9 +8,9 @@ import org.testng.annotations.DataProvider;
     glue = "demo/spring/selenium/stepdefinitions",
     features = "src/test/resources/features",
     plugin = {
-        "pretty",
-        "html:build/test-results/html-report.html",
-        "json:build/test-results/json-report.json"
+        "pretty"
+        ,"html:build/test-results/html-report.html"
+        ,"json:build/test-results/json-report.json"
     })
 public class CucumberRunner extends AbstractTestNGCucumberTests {
 
