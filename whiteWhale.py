@@ -6,6 +6,8 @@ from webdriver_manager.firefox import GeckoDriverManager
 import requests
 import logging
 
+#A quick and dirty implimentation in python
+
 def clearLogs(aDriver):
     script = "console.clear();"
     aDriver.execute_script(script)
